@@ -114,6 +114,22 @@ app.MapGet("/cards", () => CatalogoStore.CardsPersonaje)
     .WithTags("CardsPersonaje")
     .Produces<List<CardPersonaje>>(200);
 //----------------------------------------------------
+app.MapGet("/cards/{id:int}", (int id) =>
+{
+    var card = CatalogoStore.CardsPersonaje
+        .FirstOrDefault(c => c.Id == id);
+
+    return card is null
+        ? Results.NotFound()
+        : Results.Ok(card);
+})
+.WithName("ObtenerCardPorId")
+.WithSummary("Obtiene una card específica por su id.")
+.WithTags("CardsPersonaje")
+.Produces<CardPersonaje>(200)
+.Produces(404);
+//---------------------------------------------------
+
 app.MapGet("/", () => Results.Redirect("/swagger"))
    .ExcludeFromDescription();
 
