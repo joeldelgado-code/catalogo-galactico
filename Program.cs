@@ -86,6 +86,26 @@ app.MapPut("/personajes/{id:int}", (int id, Personaje datos) =>
 .Produces<Personaje>(200)
 .Produces(404);
 //------------------------------------------------------
+app.MapDelete("/personajes/{id:int}", (int id) =>
+{
+    var personaje = CatalogoStore.Personajes
+        .FirstOrDefault(p => p.Id == id);
+
+    if (personaje is null)
+    {
+        return Results.NotFound();
+    }
+
+    CatalogoStore.Personajes.Remove(personaje);
+
+    return Results.NoContent();
+})
+.WithName("EliminarPersonaje")
+.WithSummary("Elimina un personaje existente.")
+.WithTags("Personajes")
+.Produces(204)
+.Produces(404);
+//------------------------------------------------------
 app.MapGet("/", () => Results.Redirect("/swagger"))
    .ExcludeFromDescription();
 
