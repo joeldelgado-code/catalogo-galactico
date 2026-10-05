@@ -94,4 +94,114 @@ public static class EventoService
 
         return true;
     }
+    public static object SimularEvento(Evento evento)
+    {
+        var participantes = CatalogoStore.Personajes
+            .Where(p => evento.Participantes.Contains(p.Id))
+            .ToList();
+
+        var resultados = new Dictionary<Faccion, int>();
+
+        foreach (var faccion in Enum.GetValues<Faccion>())
+        {
+            var poder = 0;
+
+            foreach (var personaje in participantes.Where(p => p.Faccion == faccion))
+            {
+                var card = CatalogoStore.CardsPersonaje
+                    .FirstOrDefault(c => c.PersonajeId == personaje.Id);
+
+                if (card is not null)
+                {
+                    poder += card.Poder;
+                }
+            }
+
+            if (poder > 0)
+            {
+                resultados[faccion] = poder;
+            }
+        }
+
+        var random = new Random();
+
+        var poderesFinales = resultados.ToDictionary(
+            x => x.Key,
+            x => x.Value * (random.Next(90, 111) / 100.0)
+        );
+
+        var ganador = poderesFinales
+            .OrderByDescending(x => x.Value)
+            .First();
+
+        return new
+        {
+            Evento = evento.Nombre,
+            PoderPorFaccion = poderesFinales,
+            Ganador = ganador.Key.ToString(),
+            PoderGanador = ganador.Value
+        };
+    }
+    public static void ActualizarFallecidos(Evento evento)
+    {
+        foreach (var fallecidoId in evento.Fallecidos)
+        {
+            var personaje = CatalogoStore.Personajes
+                .FirstOrDefault(p => p.Id == fallecidoId);
+
+            if (personaje is not null)
+            {
+                personaje.Estado = Estado.Muerto;
+            }
+        }
+    }
+    public static List<object> ObtenerRankingPorPoder()
+    {
+        var ranking = CatalogoStore.Personajes
+            .Select(personaje =>
+            {
+                var card = CatalogoStore.CardsPersonaje
+                    .FirstOrDefault(c => c.PersonajeId == personaje.Id);
+
+                return new
+                {
+                    Personaje = personaje.Nombre,
+                    Poder = card?.Poder ?? 0
+                };
+            })
+            .OrderByDescending(x => x.Poder)
+            .ToList();
+
+        return ranking.Cast<object>().ToList();
+    }
+    public static object? ObtenerMvp(Evento evento)
+    {
+        var mvp = CatalogoStore.Personajes
+            .Where(p => evento.Participantes.Contains(p.Id))
+            .Select(personaje =>
+            {
+                var card = CatalogoStore.CardsPersonaje
+                    .FirstOrDefault(c => c.PersonajeId == personaje.Id);
+
+                return new
+                {
+                    Personaje = personaje,
+                    Card = card
+                };
+            })
+            .Where(x => x.Card is not null)
+            .OrderByDescending(x => x.Card!.Poder)
+            .FirstOrDefault();
+
+        if (mvp is null)
+        {
+            return null;
+        }
+
+        return new
+        {
+            Personaje = mvp.Personaje.Nombre,
+            Poder = mvp.Card!.Poder
+        };
+    }
 }

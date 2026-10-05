@@ -130,6 +130,26 @@ app.MapGet("/personajes/{id:int}/eventos", (int id) =>
 .WithTags("Personajes")
 .Produces<List<Evento>>(200)
 .Produces(404);
+//----------------------------------------------------
+// GET /personajes/ranking
+//----------------------------------------------------
+app.MapGet("/personajes/ranking", (string? por) =>
+{
+    if (por != "poder")
+    {
+        return Results.BadRequest(
+            "El parámetro 'por' debe ser 'poder'.");
+    }
+
+    var ranking = EventoService.ObtenerRankingPorPoder();
+
+    return Results.Ok(ranking);
+})
+.WithName("RankingPersonajes")
+.WithSummary("Obtiene el ranking de personajes por poder.")
+.WithTags("Personajes")
+.Produces(200)
+.Produces(400);
 //------------------------------------------------------
 //endpoints cards
 //---------------------------------------------------
@@ -315,6 +335,72 @@ app.MapPut("/eventos/{id:int}", (int id, Evento datos) =>
 .Produces<Evento>(200)
 .Produces(404);
 //----------------------------------------------------
+// POST /eventos/{id}/simular
+//----------------------------------------------------
+app.MapPost("/eventos/{id:int}/simular", (int id) =>
+    {
+        var evento = CatalogoStore.Eventos
+            .FirstOrDefault(e => e.Id == id);
+
+        if (evento is null)
+        {
+            return Results.NotFound();
+        }
+
+        if (!EventoService.TieneSuficientesParticipantes(evento.Participantes))
+        {
+            return Results.BadRequest(
+                "El evento debe tener al menos 2 participantes.");
+        }
+
+        if (!EventoService.TodosTienenCard(evento.Participantes))
+        {
+            return Results.BadRequest(
+                "Todos los participantes deben tener una card.");
+        }
+
+        var resultado = EventoService.SimularEvento(evento);
+
+        EventoService.ActualizarFallecidos(evento);
+
+        return Results.Ok(resultado);
+    })
+.WithName("SimularEvento")
+.WithSummary("Simula el resultado de un evento.")
+.WithTags("Eventos")
+.Produces(200)
+.Produces(400)
+.Produces(404);
+//---------------------------------------------
+// GET /eventos/{id}/mvp
+//----------------------------------------------------
+app.MapGet("/eventos/{id:int}/mvp", (int id) =>
+{
+    var evento = CatalogoStore.Eventos
+        .FirstOrDefault(e => e.Id == id);
+
+    if (evento is null)
+    {
+        return Results.NotFound();
+    }
+
+    var mvp = EventoService.ObtenerMvp(evento);
+
+    if (mvp is null)
+    {
+        return Results.BadRequest(
+            "Ningún participante tiene una card.");
+    }
+
+    return Results.Ok(mvp);
+})
+.WithName("ObtenerMvp")
+.WithSummary("Obtiene el personaje con mayor poder de un evento.")
+.WithTags("Eventos")
+.Produces(200)
+.Produces(400)
+.Produces(404);
+//-------------------------------------------------------
 app.MapGet("/", () => Results.Redirect("/swagger"))
    .ExcludeFromDescription();
 
