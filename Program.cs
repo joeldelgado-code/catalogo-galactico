@@ -106,6 +106,30 @@ app.MapDelete("/personajes/{id:int}", (int id) =>
 .WithTags("Personajes")
 .Produces(204)
 .Produces(404);
+//----------------------------------------------------
+// GET /personajes/{id}/eventos
+//----------------------------------------------------
+app.MapGet("/personajes/{id:int}/eventos", (int id) =>
+{
+    var personaje = CatalogoStore.Personajes
+        .FirstOrDefault(p => p.Id == id);
+
+    if (personaje is null)
+    {
+        return Results.NotFound();
+    }
+
+    var eventos = CatalogoStore.Eventos
+        .Where(e => e.Participantes.Contains(id))
+        .ToList();
+
+    return Results.Ok(eventos);
+})
+.WithName("ObtenerEventosPorPersonaje")
+.WithSummary("Obtiene los eventos en los que participó un personaje.")
+.WithTags("Personajes")
+.Produces<List<Evento>>(200)
+.Produces(404);
 //------------------------------------------------------
 //endpoints cards
 //---------------------------------------------------
@@ -207,15 +231,36 @@ app.MapGet("/eventos/{id:int}", (int id) =>
 .Produces<Evento>(200)
 .Produces(404);
 //----------------------------------------------------
-//----------------------------------------------------
-//----------------------------------------------------
 // POST /eventos
 //----------------------------------------------------
 app.MapPost("/eventos", (Evento evento) =>
 {
+    if (!EventoService.TieneSuficientesParticipantes(evento.Participantes))
+    {
+        return Results.BadRequest("El evento debe tener al menos 2 participantes.");
+    }
+
     if (!EventoService.ParticipantesExisten(evento.Participantes))
     {
         return Results.BadRequest("Uno o más participantes no existen.");
+    }
+
+    if (!EventoService.ParticipantesEstanVivos(evento.Participantes))
+    {
+        return Results.BadRequest("Uno o más participantes están muertos.");
+    }
+
+    if (!EventoService.NoHayParticipantesRepetidos(evento.Participantes))
+    {
+        return Results.BadRequest("No se permiten participantes repetidos.");
+    }
+    if (!EventoService.ParticipantesRespetanFechaDeMuerte(evento))
+    {
+        return Results.BadRequest("Un personaje no puede participar después de su muerte.");
+    }
+    if (!EventoService.FallecidosSonParticipantes(evento))
+    {
+        return Results.BadRequest("Los fallecidos deben ser participantes del evento.");
     }
 
     var nuevoId = CatalogoStore.Eventos.Count == 0
@@ -223,15 +268,16 @@ app.MapPost("/eventos", (Evento evento) =>
         : CatalogoStore.Eventos.Max(e => e.Id) + 1;
 
     evento = new Evento
-    {
-        Id = nuevoId,
-        Nombre = evento.Nombre,
-        Fecha = evento.Fecha,
-        Ubicacion = evento.Ubicacion,
-        Descripcion = evento.Descripcion,
-        Participantes = evento.Participantes,
-        Resultado = evento.Resultado
-    };
+{
+    Id = nuevoId,
+    Nombre = evento.Nombre,
+    Fecha = evento.Fecha,
+    Ubicacion = evento.Ubicacion,
+    Descripcion = evento.Descripcion,
+    Participantes = evento.Participantes,
+    Fallecidos = evento.Fallecidos,
+    Resultado = evento.Resultado
+};
 
     CatalogoStore.Eventos.Add(evento);
 
@@ -259,8 +305,8 @@ app.MapPut("/eventos/{id:int}", (int id, Evento datos) =>
     evento.Ubicacion = datos.Ubicacion;
     evento.Descripcion = datos.Descripcion;
     evento.Participantes = datos.Participantes;
+    evento.Fallecidos = datos.Fallecidos;
     evento.Resultado = datos.Resultado;
-
     return Results.Ok(evento);
 })
 .WithName("ActualizarEvento")

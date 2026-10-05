@@ -14,5 +14,7 @@ public class Evento
 
     public List<int> Participantes { get; set; } = new();
 
+    public List<int> Fallecidos { get; set; } = new();
+
     public string Resultado { get; set; } = string.Empty;
 }
