@@ -129,7 +129,33 @@ app.MapGet("/cards/{id:int}", (int id) =>
 .Produces<CardPersonaje>(200)
 .Produces(404);
 //---------------------------------------------------
+//----------------------------------------------------
+app.MapPost("/cards", (CardPersonaje card) =>
+{
+    var nuevoId = CatalogoStore.CardsPersonaje.Count == 0
+        ? 1
+        : CatalogoStore.CardsPersonaje.Max(c => c.Id) + 1;
 
+    card = new CardPersonaje
+    {
+        Id = nuevoId,
+        PersonajeId = card.PersonajeId,
+        Poder = card.Poder,
+        HabilidadEspecial = card.HabilidadEspecial,
+        Arma = card.Arma,
+        NivelPeligrosidad = card.NivelPeligrosidad,
+        ImagenUrl = card.ImagenUrl
+    };
+
+    CatalogoStore.CardsPersonaje.Add(card);
+
+    return Results.Created($"/cards/{card.Id}", card);
+})
+.WithName("CrearCard")
+.WithSummary("Crea una nueva card de personaje.")
+.WithTags("CardsPersonaje")
+.Produces<CardPersonaje>(201);
+//----------------------------------------------------
 app.MapGet("/", () => Results.Redirect("/swagger"))
    .ExcludeFromDescription();
 
