@@ -182,6 +182,14 @@ app.MapPut("/cards/{id:int}", (int id, CardPersonaje datos) =>
 .Produces<CardPersonaje>(200)
 .Produces(404);
 //----------------------------------------------------
+//endpoints de EVENTOS
+//----------------------------------------------------
+app.MapGet("/eventos", () => CatalogoStore.Eventos)
+    .WithName("ObtenerEventos")
+    .WithSummary("Lista todos los eventos registrados.")
+    .WithTags("Eventos")
+    .Produces<List<Evento>>(200);
+//----------------------------------------------------
 app.MapGet("/", () => Results.Redirect("/swagger"))
    .ExcludeFromDescription();
 
