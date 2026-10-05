@@ -1,5 +1,6 @@
 using CatalogoGalactico.Data;
 using CatalogoGalactico.Models;
+using CatalogoGalactico.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -207,8 +208,16 @@ app.MapGet("/eventos/{id:int}", (int id) =>
 .Produces(404);
 //----------------------------------------------------
 //----------------------------------------------------
+//----------------------------------------------------
+// POST /eventos
+//----------------------------------------------------
 app.MapPost("/eventos", (Evento evento) =>
 {
+    if (!EventoService.ParticipantesExisten(evento.Participantes))
+    {
+        return Results.BadRequest("Uno o más participantes no existen.");
+    }
+
     var nuevoId = CatalogoStore.Eventos.Count == 0
         ? 1
         : CatalogoStore.Eventos.Max(e => e.Id) + 1;
@@ -231,7 +240,8 @@ app.MapPost("/eventos", (Evento evento) =>
 .WithName("CrearEvento")
 .WithSummary("Crea un nuevo evento.")
 .WithTags("Eventos")
-.Produces<Evento>(201);
+.Produces<Evento>(201)
+.Produces(400);
 //----------------------------------------------------
 //----------------------------------------------------
 app.MapPut("/eventos/{id:int}", (int id, Evento datos) =>
