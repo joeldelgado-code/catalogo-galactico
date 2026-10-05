@@ -206,6 +206,33 @@ app.MapGet("/eventos/{id:int}", (int id) =>
 .Produces<Evento>(200)
 .Produces(404);
 //----------------------------------------------------
+//----------------------------------------------------
+app.MapPost("/eventos", (Evento evento) =>
+{
+    var nuevoId = CatalogoStore.Eventos.Count == 0
+        ? 1
+        : CatalogoStore.Eventos.Max(e => e.Id) + 1;
+
+    evento = new Evento
+    {
+        Id = nuevoId,
+        Nombre = evento.Nombre,
+        Fecha = evento.Fecha,
+        Ubicacion = evento.Ubicacion,
+        Descripcion = evento.Descripcion,
+        Participantes = evento.Participantes,
+        Resultado = evento.Resultado
+    };
+
+    CatalogoStore.Eventos.Add(evento);
+
+    return Results.Created($"/eventos/{evento.Id}", evento);
+})
+.WithName("CrearEvento")
+.WithSummary("Crea un nuevo evento.")
+.WithTags("Eventos")
+.Produces<Evento>(201);
+//----------------------------------------------------
 app.MapGet("/", () => Results.Redirect("/swagger"))
    .ExcludeFromDescription();
 
