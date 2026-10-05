@@ -106,6 +106,14 @@ app.MapDelete("/personajes/{id:int}", (int id) =>
 .Produces(204)
 .Produces(404);
 //------------------------------------------------------
+//endpoints cards
+//---------------------------------------------------
+app.MapGet("/cards", () => CatalogoStore.CardsPersonaje)
+    .WithName("ObtenerCards")
+    .WithSummary("Lista todas las cards de personajes.")
+    .WithTags("CardsPersonaje")
+    .Produces<List<CardPersonaje>>(200);
+//----------------------------------------------------
 app.MapGet("/", () => Results.Redirect("/swagger"))
    .ExcludeFromDescription();
 
