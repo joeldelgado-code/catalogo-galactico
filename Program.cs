@@ -14,12 +14,29 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+//-------------------------------------------
+app.MapGet("/personajes", (Faccion? faccion, bool? fuerzaSensitivo) =>
+{
+    var personajes = CatalogoStore.Personajes.AsEnumerable();
 
-app.MapGet("/personajes", () => CatalogoStore.Personajes)
-    .WithName("ObtenerPersonajes")
-    .WithSummary("Lista todos los personajes registrados.")
-    .WithTags("Personajes")
-    .Produces<List<Personaje>>(200);
+    if (faccion.HasValue)
+    {
+        personajes = personajes
+            .Where(p => p.Faccion == faccion.Value);
+    }
+
+    if (fuerzaSensitivo.HasValue)
+    {
+        personajes = personajes
+            .Where(p => p.FuerzaSensitivo == fuerzaSensitivo.Value);
+    }
+
+    return Results.Ok(personajes.ToList());
+})
+.WithName("ObtenerPersonajes")
+.WithSummary("Lista personajes y permite filtrar por facción y sensibilidad a la Fuerza.")
+.WithTags("Personajes")
+.Produces<List<Personaje>>(200);
 //------------------------------------------------------------
 app.MapGet("/personajes/{id:int}", (int id) =>
 {
