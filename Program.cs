@@ -233,6 +233,32 @@ app.MapPost("/eventos", (Evento evento) =>
 .WithTags("Eventos")
 .Produces<Evento>(201);
 //----------------------------------------------------
+//----------------------------------------------------
+app.MapPut("/eventos/{id:int}", (int id, Evento datos) =>
+{
+    var evento = CatalogoStore.Eventos
+        .FirstOrDefault(e => e.Id == id);
+
+    if (evento is null)
+    {
+        return Results.NotFound();
+    }
+
+    evento.Nombre = datos.Nombre;
+    evento.Fecha = datos.Fecha;
+    evento.Ubicacion = datos.Ubicacion;
+    evento.Descripcion = datos.Descripcion;
+    evento.Participantes = datos.Participantes;
+    evento.Resultado = datos.Resultado;
+
+    return Results.Ok(evento);
+})
+.WithName("ActualizarEvento")
+.WithSummary("Actualiza un evento existente.")
+.WithTags("Eventos")
+.Produces<Evento>(200)
+.Produces(404);
+//----------------------------------------------------
 app.MapGet("/", () => Results.Redirect("/swagger"))
    .ExcludeFromDescription();
 
