@@ -156,6 +156,32 @@ app.MapPost("/cards", (CardPersonaje card) =>
 .WithTags("CardsPersonaje")
 .Produces<CardPersonaje>(201);
 //----------------------------------------------------
+//----------------------------------------------------
+app.MapPut("/cards/{id:int}", (int id, CardPersonaje datos) =>
+{
+    var card = CatalogoStore.CardsPersonaje
+        .FirstOrDefault(c => c.Id == id);
+
+    if (card is null)
+    {
+        return Results.NotFound();
+    }
+
+    card.PersonajeId = datos.PersonajeId;
+    card.Poder = datos.Poder;
+    card.HabilidadEspecial = datos.HabilidadEspecial;
+    card.Arma = datos.Arma;
+    card.NivelPeligrosidad = datos.NivelPeligrosidad;
+    card.ImagenUrl = datos.ImagenUrl;
+
+    return Results.Ok(card);
+})
+.WithName("ActualizarCard")
+.WithSummary("Actualiza una card de personaje existente.")
+.WithTags("CardsPersonaje")
+.Produces<CardPersonaje>(200)
+.Produces(404);
+//----------------------------------------------------
 app.MapGet("/", () => Results.Redirect("/swagger"))
    .ExcludeFromDescription();
 
