@@ -190,6 +190,22 @@ app.MapGet("/eventos", () => CatalogoStore.Eventos)
     .WithTags("Eventos")
     .Produces<List<Evento>>(200);
 //----------------------------------------------------
+//----------------------------------------------------
+app.MapGet("/eventos/{id:int}", (int id) =>
+{
+    var evento = CatalogoStore.Eventos
+        .FirstOrDefault(e => e.Id == id);
+
+    return evento is null
+        ? Results.NotFound()
+        : Results.Ok(evento);
+})
+.WithName("ObtenerEventoPorId")
+.WithSummary("Obtiene un evento específico por su id.")
+.WithTags("Eventos")
+.Produces<Evento>(200)
+.Produces(404);
+//----------------------------------------------------
 app.MapGet("/", () => Results.Redirect("/swagger"))
    .ExcludeFromDescription();
 
