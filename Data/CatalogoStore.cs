@@ -14,7 +14,9 @@ public static class CatalogoStore
             Faccion = Faccion.Rebelde,
             Afiliacion = "Alianza Rebelde",
             Estado = Estado.Vivo,
-            FuerzaSensitivo = true
+            FuerzaSensitivo = true,
+            ImagenUrl = "https://i.pinimg.com/236x/a6/a7/3a/a6a73a216e23b23c3f83e34bfa1fd9ca.jpg"
+           
         },
 
         new Personaje
@@ -25,7 +27,9 @@ public static class CatalogoStore
             Faccion = Faccion.Imperio,
             Afiliacion = "Imperio Galáctico",
             Estado = Estado.Muerto,
-            FuerzaSensitivo = true
+            FuerzaSensitivo = true,
+            ImagenUrl = "https://i.pinimg.com/236x/2e/01/f5/2e01f510d3d2fcd9e48c1bbcdc3c4083.jpg"
+            
         },
 
         new Personaje
@@ -36,7 +40,9 @@ public static class CatalogoStore
             Faccion = Faccion.Rebelde,
             Afiliacion = "Alianza Rebelde",
             Estado = Estado.Vivo,
-            FuerzaSensitivo = false
+            FuerzaSensitivo = false,
+            ImagenUrl = "https://i.pinimg.com/236x/17/18/1f/17181f08fba41abae0422a410c893d35.jpg"
+        
         },
 
         new Personaje
@@ -47,7 +53,9 @@ public static class CatalogoStore
             Faccion = Faccion.Neutral,
             Afiliacion = "Cazarrecompensas",
             Estado = Estado.Vivo,
-            FuerzaSensitivo = false
+            FuerzaSensitivo = false,
+            ImagenUrl = "https://es.wikipedia.org/wiki/Luke_Skywalker"
+            
         },
 
         new Personaje
@@ -58,7 +66,9 @@ public static class CatalogoStore
             Faccion = Faccion.Rebelde,
             Afiliacion = "Orden Jedi",
             Estado = Estado.Muerto,
-            FuerzaSensitivo = true
+            FuerzaSensitivo = true,
+            ImagenUrl = "https://es.wikipedia.org/wiki/Luke_Skywalker"
+           
         }
     };
 
@@ -72,7 +82,7 @@ public static class CatalogoStore
         HabilidadEspecial = "Maestro Jedi",
         Arma = "Sable de luz",
         NivelPeligrosidad = 8,
-        ImagenUrl = "https://example.com/luke.jpg"
+        ImagenUrl = "https://es.wikipedia.org/wiki/Luke_Skywalker"
     },
 
     new CardPersonaje

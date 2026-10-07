@@ -15,6 +15,8 @@ public class Personaje
     public Estado Estado { get; set; }
 
     public bool FuerzaSensitivo { get; set; }
+
+    public string ImagenUrl { get; set; } = string.Empty;
 }
 public enum Faccion
 {

@@ -94,6 +94,7 @@ public static class EventoService
 
         return true;
     }
+    //------------------------------------------------------------------------------------
     public static object SimularEvento(Evento evento)
     {
         var participantes = CatalogoStore.Personajes
@@ -142,6 +143,8 @@ public static class EventoService
             PoderGanador = ganador.Value
         };
     }
+
+    //---------------------------------------------------------
     public static void ActualizarFallecidos(Evento evento)
     {
         foreach (var fallecidoId in evento.Fallecidos)
