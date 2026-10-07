@@ -415,7 +415,7 @@ app.MapPost("/eventos/{id:int}/simular", (int id) =>
 
         EventoService.ActualizarFallecidos(evento);
 
-        return Results.Ok(resultado);
+        return Results.Ok(evento);
     })
 .WithName("SimularEvento")
 .WithSummary("Simula el resultado de un evento.")
