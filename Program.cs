@@ -6,9 +6,16 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+        policy.WithOrigins("http://localhost:5173")
+              .AllowAnyHeader()
+              .AllowAnyMethod());
+});
 
 var app = builder.Build();
-
+app.UseCors();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -147,6 +154,34 @@ app.MapGet("/personajes/{id:int}/eventos", (int id) =>
 .WithTags("Personajes")
 .Produces<List<Evento>>(200)
 .Produces(404);
+//-----------------------------------------
+//----------------------------------------------------
+app.MapGet("/personajes/{id:int}/con-card", (int id) =>
+{
+    var personaje = CatalogoStore.Personajes
+        .FirstOrDefault(p => p.Id == id);
+
+    if (personaje is null)
+    {
+        return Results.NotFound();
+    }
+
+    var card = CatalogoStore.CardsPersonaje
+        .FirstOrDefault(c => c.PersonajeId == id);
+
+    return Results.Ok(new
+    {
+        Personaje = personaje,
+        Card = card
+    });
+})
+.WithName("ObtenerCardDePersonaje")
+.WithSummary("Obtiene un personaje específico junto a su card.")
+.WithTags("Personajes")
+.Produces(200, typeof(object)) 
+.Produces(404);
+
+
 //----------------------------------------------------
 // GET /personajes/ranking
 //----------------------------------------------------
